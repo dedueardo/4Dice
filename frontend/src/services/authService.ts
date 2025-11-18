@@ -1,58 +1,148 @@
-import axios from 'axios';
+import api from './api';
+import { User, LoginFormData, RegisterFormData, ApiResponse } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+interface LoginResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface RegisterResponse {
+  user: User;
+  message: string;
+}
 
 export const authService = {
-  async register(data: {
-    username: string;
-    email: string;
-    password: string;
-    avatar?: string;
-  }) {
-    const response = await axios.post(`${API_URL}/auth/register`, data);
-    return response.data;
-  },
-
-  async login(email: string, password: string, rememberMe: boolean = false) {
-    const response = await axios.post(`${API_URL}/auth/login`, {
-      email,
-      password,
-      rememberMe,
+  /**
+   * Faz login do usuário
+   */
+  async login(data: LoginFormData): Promise<LoginResponse> {
+    const response = await api.post<ApiResponse<LoginResponse>>('/auth/login', {
+      email: data.email,
+      password: data.password,
     });
-    
-    if (response.data.accessToken) {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      if (response.data.refreshToken) {
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-      }
+
+    const { user, accessToken, refreshToken } = response.data.data;
+
+    // Salvar tokens no localStorage
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+
+    // Se "Lembrar-me" estiver marcado, salvar por mais tempo
+    if (data.rememberMe) {
+      localStorage.setItem('rememberMe', 'true');
     }
+
+    return response.data.data;
+  },
+
+  /**
+   * Registra novo usuário
+   */
+  async register(data: RegisterFormData): Promise<RegisterResponse> {
+    const formData = new FormData();
     
-    return response.data;
+    formData.append('username', data.username);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    
+    if (data.avatar) {
+      formData.append('avatar', data.avatar);
+    }
+
+    const response = await api.post<ApiResponse<RegisterResponse>>('/auth/register', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data.data;
   },
 
-  async logout() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+  /**
+   * Faz logout do usuário
+   */
+  async logout(): Promise<void> {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    } finally {
+      // Limpar tokens independente do resultado
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('rememberMe');
+    }
   },
 
-  async forgotPassword(email: string) {
-    const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
-    return response.data;
+  /**
+   * Envia email para recuperação de senha
+   */
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', {
+      email,
+    });
+
+    return response.data.data;
   },
 
-  async resetPassword(token: string, newPassword: string) {
-    const response = await axios.post(`${API_URL}/auth/reset-password`, {
+  /**
+   * Redefine senha com token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const response = await api.post<ApiResponse<{ message: string }>>('/auth/reset-password', {
       token,
       newPassword,
     });
-    return response.data;
+
+    return response.data.data;
   },
 
-  getAccessToken() {
+  /**
+   * Busca informações do usuário atual
+   */
+  async getCurrentUser(): Promise<User> {
+    const response = await api.get<ApiResponse<User>>('/auth/me');
+    return response.data.data;
+  },
+
+  /**
+   * Atualiza perfil do usuário
+   */
+  async updateProfile(data: Partial<User> & { avatar?: File }): Promise<User> {
+    const formData = new FormData();
+
+    if (data.username) formData.append('username', data.username);
+    if (data.biography) formData.append('biography', data.biography);
+    if (data.avatar) formData.append('avatar', data.avatar);
+
+    const response = await api.patch<ApiResponse<User>>('/auth/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data.data;
+  },
+
+  /**
+   * Verifica se usuário está autenticado
+   */
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('accessToken');
+  },
+
+  /**
+   * Retorna o token de acesso
+   */
+  getAccessToken(): string | null {
     return localStorage.getItem('accessToken');
   },
 
-  getRefreshToken() {
+  /**
+   * Retorna o refresh token
+   */
+  getRefreshToken(): string | null {
     return localStorage.getItem('refreshToken');
   },
 };
