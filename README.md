@@ -27,9 +27,10 @@ frontend/
 │   │   └── sessions/
 │   ├── hooks/              # Custom hooks
 │   ├── services/           # Serviços de API
+│   ├── stores/             # Zustand stores 
 │   ├── utils/              # Funções utilitárias
 │   ├── types/              # TypeScript types/interfaces
-│   ├── contexts/           # Context API
+│   ├── contexts/           # Context API (se necessário)
 │   ├── routes/             # Configuração de rotas
 │   ├── assets/             # Imagens, ícones, etc
 │   └── styles/             # Estilos globais
