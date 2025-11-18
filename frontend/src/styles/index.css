@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Importar fonte do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-gray-700;
+  }
+
+  body {
+    @apply bg-gray-900 text-gray-100 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-gray-100;
+  }
+
+  /* Scrollbar customizada */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full hover:bg-gray-500;
+  }
+}
+
+@layer components {
+  /* Card padrão */
+  .card {
+    @apply bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700 
+           hover:border-gray-600 transition-colors;
+  }
+
+  .card-header {
+    @apply text-xl font-semibold mb-4 text-gray-100;
+  }
+
+  /* Input padrão */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-lg bg-gray-700 text-white border border-gray-600 
+           focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50
+           placeholder:text-gray-400 transition-all;
+  }
+
+  .input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500/50;
+  }
+
+  /* Label padrão */
+  .label {
+    @apply block text-gray-300 mb-2 font-medium text-sm;
+  }
+
+  /* Botões base */
+  .btn {
+    @apply px-4 py-2.5 rounded-lg font-medium transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-gray-300 hover:bg-gray-800 focus:ring-gray-500;
+  }
+
+  /* Badge/Tag */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-blue-600/20 text-blue-400 border border-blue-500/30;
+  }
+
+  .badge-success {
+    @apply badge bg-green-600/20 text-green-400 border border-green-500/30;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-600/20 text-yellow-400 border border-yellow-500/30;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-600/20 text-red-400 border border-red-500/30;
+  }
+
+  /* Modal Overlay */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-40;
+  }
+
+  .modal-content {
+    @apply fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 
+           bg-gray-800 rounded-lg shadow-2xl border border-gray-700 
+           max-h-[90vh] overflow-y-auto z-50;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  .glow-dice {
+    filter: drop-shadow(0 0 10px currentColor);
+  }
+}
