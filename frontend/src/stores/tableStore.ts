@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Table } from '../types';
+import type { Table } from '../types';
 import { tableService } from '../services';
 
 interface TableState {

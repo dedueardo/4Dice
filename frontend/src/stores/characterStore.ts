@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Character } from '../types';
+import type { Character } from '../types';
 import { characterService } from '../services';
 
 interface CharacterState {
