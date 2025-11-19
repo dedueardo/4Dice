@@ -1,4 +1,4 @@
-import { DiceType, DiceRoll, DiceFormula, DiceTerm } from '../types';
+import type { DiceType, DiceRoll, DiceFormula, DiceTerm } from '../types';
 
 /**
  * Rola um dado e retorna o resultado

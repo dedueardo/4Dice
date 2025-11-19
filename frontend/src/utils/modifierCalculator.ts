@@ -1,4 +1,4 @@
-import { Attributes } from '../types';
+import type { Attributes } from '../types';
 
 /**
  * Calcula o modificador de um atributo
