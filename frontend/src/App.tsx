@@ -7,7 +7,6 @@ function App() {
     <>
       <RouterProvider router={router} />
 
-      {/* Toast Notifications */}
       <Toaster
         position="top-right"
         toastOptions={{

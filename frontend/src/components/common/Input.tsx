@@ -1,99 +1,99 @@
 import React from 'react';
 import { cn } from '../../utils';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'success';
-  size?: 'sm' | 'md' | 'lg';
-  isLoading?: boolean;
-  fullWidth?: boolean;
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  helperText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      children,
       className,
-      variant = 'primary',
-      size = 'md',
-      isLoading = false,
-      fullWidth = false,
+      label,
+      error,
+      helperText,
       leftIcon,
       rightIcon,
-      disabled,
+      id,
       ...props
     },
     ref
   ) => {
+    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+
     return (
-      <button
-        ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center rounded-lg font-medium',
-          'transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2',
-          'focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed',
-          'active:scale-95',
-          {
-            // Variants
-            'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500':
-              variant === 'primary',
-            'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500':
-              variant === 'secondary',
-            'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500':
-              variant === 'danger',
-            'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500':
-              variant === 'success',
-            'bg-transparent text-gray-300 hover:bg-gray-800 focus:ring-gray-500':
-              variant === 'ghost',
-
-            // Sizes
-            'px-3 py-1.5 text-sm gap-1.5': size === 'sm',
-            'px-4 py-2.5 text-base gap-2': size === 'md',
-            'px-6 py-3 text-lg gap-2.5': size === 'lg',
-
-            // Full width
-            'w-full': fullWidth,
-          },
-          className
+      <div className="w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
+            {label}
+            {props.required && <span className="text-red-500 ml-1">*</span>}
+          </label>
         )}
-        disabled={disabled || isLoading}
-        {...props}
-      >
-        {isLoading ? (
-          <>
+
+        <div className="relative">
+          {leftIcon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              {leftIcon}
+            </div>
+          )}
+
+          <input
+            ref={ref}
+            id={inputId}
+            className={cn(
+              'w-full px-4 py-2.5 rounded-lg bg-gray-700 text-white border',
+              'transition-colors duration-200',
+              'placeholder:text-gray-400',
+              'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              {
+                'border-gray-600 focus:border-blue-500 focus:ring-blue-500': !error,
+                'border-red-500 focus:border-red-500 focus:ring-red-500': error,
+                'pl-10': leftIcon,
+                'pr-10': rightIcon,
+              },
+              className
+            )}
+            {...props}
+          />
+
+          {rightIcon && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              {rightIcon}
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1">
             <svg
-              className="animate-spin h-5 w-5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
+              className="w-4 h-4"
+              fill="currentColor"
+              viewBox="0 0 20 20"
             >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
               <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
               />
             </svg>
-            <span>Carregando...</span>
-          </>
-        ) : (
-          <>
-            {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-            {children}
-            {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
-          </>
+            {error}
+          </p>
         )}
-      </button>
+
+        {helperText && !error && (
+          <p className="mt-1.5 text-sm text-gray-400">{helperText}</p>
+        )}
+      </div>
     );
   }
 );
 
-Button.displayName = 'Button';
+Input.displayName = 'Input';
