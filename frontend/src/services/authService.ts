@@ -1,5 +1,5 @@
 import api from './api';
-import { User, LoginFormData, RegisterFormData, ApiResponse } from '../types';
+import type { User, LoginFormData, RegisterFormData, ApiResponse } from '../types';
 
 interface LoginResponse {
   user: User;

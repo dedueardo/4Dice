@@ -1,5 +1,5 @@
 import api from './api';
-import { Character, CreateCharacterFormData, ApiResponse } from '../types';
+import type { Character, CreateCharacterFormData, ApiResponse } from '../types';
 
 export const characterService = {
   /**

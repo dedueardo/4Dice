@@ -1,5 +1,5 @@
 import api from './api';
-import { Table, CreateTableFormData, ApiResponse, PaginatedResponse } from '../types';
+import type { Table, CreateTableFormData, ApiResponse, PaginatedResponse } from '../types';
 
 export const tableService = {
   /**
