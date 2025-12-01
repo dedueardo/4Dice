@@ -32,7 +32,8 @@ Este sistema gerencia autenticação, usuários, mesas de RPG e persistência de
 
 1. Instale as dependências:
 
-```npm install
+```
+npm install
 ```
 
 2. Configure variáveis de ambiente em um arquivo `.env` na pasta `backend`:
