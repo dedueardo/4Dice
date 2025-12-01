@@ -21,9 +21,9 @@ export function formatRelativeDate(date: string | Date): string {
 /**
  * Formata moeda (peças de ouro)
  */
-export function formatCurrency(amount: number, type: 'pp' | 'po' | 'pe' | 'pp' | 'pc' = 'po'): string {
+export function formatCurrency(amount: number, type: 'pl' | 'po' | 'pe' | 'pp' | 'pc' = 'po'): string {
   const symbols = {
-    pp: 'PP', // Platina
+    pl: 'PL', // Platina
     po: 'PO', // Ouro
     pe: 'PE', // Electrum
     pp: 'PP', // Prata
@@ -59,3 +59,11 @@ export function formatDuration(minutes: number): string {
   if (mins === 0) return `${hours}h`;
   return `${hours}h ${mins}min`;
 }
+
+export const currencyMap = {
+  pl: 'PL', // Platina (Use 'pl' em vez de 'pp' se for Platina)
+  po: 'PO', // Ouro
+  pe: 'PE', // Electrum
+  pp: 'PP', // Prata (Mantenha 'pp' aqui)
+  pc: 'PC', // Cobre
+};

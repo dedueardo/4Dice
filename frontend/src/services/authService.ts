@@ -1,148 +1,88 @@
 import api from './api';
-import type { User, LoginFormData, RegisterFormData, ApiResponse } from '../types';
-
-interface LoginResponse {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface RegisterResponse {
-  user: User;
-  message: string;
-}
+import type { LoginCredentials, RegisterData, AuthResponse, User } from '../types/index';
 
 export const authService = {
-  /**
-   * Faz login do usuário
-   */
-  async login(data: LoginFormData): Promise<LoginResponse> {
-    const response = await api.post<ApiResponse<LoginResponse>>('/auth/login', {
-      email: data.email,
-      password: data.password,
-    });
-
-    const { user, accessToken, refreshToken } = response.data.data;
-
-    // Salvar tokens no localStorage
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-
-    // Se "Lembrar-me" estiver marcado, salvar por mais tempo
-    if (data.rememberMe) {
-      localStorage.setItem('rememberMe', 'true');
-    }
-
-    return response.data.data;
+  // Login
+  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    const { data } = await api.post<AuthResponse>('/auth/login', credentials);
+    return data;
   },
 
-  /**
-   * Registra novo usuário
-   */
-  async register(data: RegisterFormData): Promise<RegisterResponse> {
+  // Registro (com upload de avatar)
+  register: async (registerData: RegisterData): Promise<{ user: User; message: string }> => {
     const formData = new FormData();
+    formData.append('username', registerData.username);
+    formData.append('email', registerData.email);
+    formData.append('password', registerData.password);
     
-    formData.append('username', data.username);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    
+    if (registerData.avatar) {
+      formData.append('avatar', registerData.avatar);
+    }
+
+    const { data } = await api.post('/auth/register', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
+  },
+
+  // Esqueci a senha
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const { data } = await api.post('/auth/forgot-password', { email });
+    return data;
+  },
+
+  // Redefinir senha
+  resetPassword: async (token: string, newPassword: string): Promise<{ message: string }> => {
+    const { data } = await api.post('/auth/reset-password', { token, newPassword });
+    return data;
+  },
+
+  // Refresh Token
+  refreshToken: async (refreshToken: string): Promise<{ accessToken: string }> => {
+    const { data } = await api.post('/auth/refresh', { refreshToken });
+    return data;
+  },
+
+  // Buscar usuário atual
+  getCurrentUser: async (): Promise<User> => {
+    const { data } = await api.get<User>('/users/me');
+    return data;
+  },
+
+  // Atualizar Perfil
+  updateProfile: async (userId: string, data: Partial<User> & { avatar?: File }): Promise<User> => {
+    // 1. Se tiver avatar, fazemos o upload primeiro
     if (data.avatar) {
-      formData.append('avatar', data.avatar);
+       const formData = new FormData();
+       formData.append('file', data.avatar);
+       
+       await api.post('/users/upload-avatar', formData, {
+         headers: { 'Content-Type': 'multipart/form-data' }
+       });
     }
 
-    const response = await api.post<ApiResponse<RegisterResponse>>('/auth/register', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    // 2. Separa dados de texto
+    const { avatar, ...textData } = data;
 
-    return response.data.data;
-  },
+    // 3. Se houver dados de texto para atualizar (ex: username)
+    if (Object.keys(textData).length > 0) {
+      // Nota: Isso requer uma rota PATCH /users/:id no backend
+      const { data: updatedUser } = await api.patch<User>(`/users/${userId}`, textData);
+      return updatedUser;
+    }
 
-  /**
-   * Faz logout do usuário
-   */
-  async logout(): Promise<void> {
+    // Se não atualizou texto, retorna o usuário atual para atualizar o estado
+    // (Assumindo que o upload do avatar já alterou o backend)
+    // Como ainda não temos a rota /users/me garantida, retornamos um objeto parcial ou buscamos novamente
+    // Por segurança, vamos tentar buscar o usuário atualizado se a rota existir
     try {
-      await api.post('/auth/logout');
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-    } finally {
-      // Limpar tokens independente do resultado
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('rememberMe');
+        const { data: currentUser } = await api.get<User>('/users/me');
+        return currentUser;
+    } catch (e) {
+        // Fallback se a rota 'me' não existir
+        return { id: userId, ...textData } as User;
     }
-  },
-
-  /**
-   * Envia email para recuperação de senha
-   */
-  async forgotPassword(email: string): Promise<{ message: string }> {
-    const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', {
-      email,
-    });
-
-    return response.data.data;
-  },
-
-  /**
-   * Redefine senha com token
-   */
-  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
-    const response = await api.post<ApiResponse<{ message: string }>>('/auth/reset-password', {
-      token,
-      newPassword,
-    });
-
-    return response.data.data;
-  },
-
-  /**
-   * Busca informações do usuário atual
-   */
-  async getCurrentUser(): Promise<User> {
-    const response = await api.get<ApiResponse<User>>('/auth/me');
-    return response.data.data;
-  },
-
-  /**
-   * Atualiza perfil do usuário
-   */
-  async updateProfile(data: Partial<User> & { avatar?: File }): Promise<User> {
-    const formData = new FormData();
-
-    if (data.username) formData.append('username', data.username);
-    if (data.biography) formData.append('biography', data.biography);
-    if (data.avatar) formData.append('avatar', data.avatar);
-
-    const response = await api.patch<ApiResponse<User>>('/auth/profile', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    return response.data.data;
-  },
-
-  /**
-   * Verifica se usuário está autenticado
-   */
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('accessToken');
-  },
-
-  /**
-   * Retorna o token de acesso
-   */
-  getAccessToken(): string | null {
-    return localStorage.getItem('accessToken');
-  },
-
-  /**
-   * Retorna o refresh token
-   */
-  getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken');
-  },
+  }
 };

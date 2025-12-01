@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link } from 'react-router-dom';
-import { Mail, ArrowLeft, Dices, CheckCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, ArrowLeft, Dices, CheckCircle, KeyRound } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { authService } from '../../services';
@@ -18,6 +18,7 @@ type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 export const ForgotPassword: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -30,9 +31,12 @@ export const ForgotPassword: React.FC = () => {
   const onSubmit = async (data: ForgotPasswordForm) => {
     setIsLoading(true);
     try {
+      // Envia o e-mail
       await authService.forgotPassword(data.email);
+
       setEmailSent(true);
-      toast.success('E-mail de recuperação enviado!');
+      toast.success('Código enviado! Verifique seu e-mail.');
+
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || 'Erro ao enviar e-mail de recuperação'
@@ -44,16 +48,13 @@ export const ForgotPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
-      {/* Efeito de fundo */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl" />
       </div>
 
-      {/* Card */}
       <div className="relative w-full max-w-md">
         <div className="bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-700">
-          {/* Botão Voltar */}
           <Link
             to="/login"
             className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-300 transition-colors mb-6"
@@ -63,7 +64,7 @@ export const ForgotPassword: React.FC = () => {
           </Link>
 
           {emailSent ? (
-            // Sucesso
+            // TELA DE SUCESSO
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600/20 border border-green-500/30 rounded-full mb-4">
                 <CheckCircle className="w-8 h-8 text-green-500" />
@@ -74,22 +75,24 @@ export const ForgotPassword: React.FC = () => {
               </h1>
 
               <p className="text-gray-400">
-                Enviamos um link de recuperação para o seu e-mail. Verifique sua
-                caixa de entrada e spam.
+                Enviamos um código de recuperação para o seu e-mail.
+                Copie o código e clique no botão abaixo para continuar.
               </p>
 
               <div className="pt-4">
-                <Link to="/login">
-                  <Button variant="primary" fullWidth>
-                    Voltar ao Login
-                  </Button>
-                </Link>
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={() => navigate('/reset-password')}
+                  leftIcon={<KeyRound className="w-4 h-4" />}
+                >
+                  Já tenho o código
+                </Button>
               </div>
             </div>
           ) : (
-            // Formulário
+            // FORMULÁRIO
             <>
-              {/* Header */}
               <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/50">
                   <Dices className="w-8 h-8 text-white" />
@@ -98,7 +101,7 @@ export const ForgotPassword: React.FC = () => {
                   Esqueceu sua senha?
                 </h1>
                 <p className="text-gray-400">
-                  Digite seu e-mail e enviaremos um link para redefinir sua senha
+                  Digite seu e-mail para receber o código de recuperação
                 </p>
               </div>
 
@@ -119,7 +122,7 @@ export const ForgotPassword: React.FC = () => {
                   fullWidth
                   isLoading={isLoading}
                 >
-                  Enviar Link de Recuperação
+                  Enviar Código
                 </Button>
               </form>
             </>

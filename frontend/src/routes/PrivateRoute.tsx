@@ -1,34 +1,23 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../stores';
-import { Loading } from '../components/common';
+import { useAuthStore } from '../stores/authStore';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
 
 export const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading, getCurrentUser } = useAuthStore();
+  const { isAuthenticated, token } = useAuthStore();
   const location = useLocation();
 
-  useEffect(() => {
-    // Tentar buscar usuário se tiver token mas não estiver autenticado
-    if (!isAuthenticated && !isLoading) {
-      getCurrentUser();
-    }
-  }, [isAuthenticated, isLoading, getCurrentUser]);
+  // Verificação de segurança:
+  // 1. Estado do Zustand (isAuthenticated)
+  // 2. Token na memória do Zustand
+  // 3. Token no localStorage (para garantir persistência no F5)
+  const isAuth = isAuthenticated || !!token || !!localStorage.getItem('accessToken');
 
-  // Mostrar loading enquanto verifica autenticação
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <Loading size="lg" text="Carregando..." />
-      </div>
-    );
-  }
-
-  // Se não estiver autenticado, redirecionar para login
-  if (!isAuthenticated) {
+  // Se não houver sinal de login, redireciona
+  if (!isAuth) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

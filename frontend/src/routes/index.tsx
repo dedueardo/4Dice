@@ -5,7 +5,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AuthLayout, DashboardLayout } from '../components/layout';
 
 // Pages
-import { Login, Register, ForgotPassword } from '../pages/Auth';
+import { Login, Register, ForgotPassword, ResetPassword } from '../pages/Auth';
 
 // Route Guards
 import { PrivateRoute } from './PrivateRoute';
@@ -117,6 +117,14 @@ export const router = createBrowserRouter([
         element: (
           <PublicRoute redirectIfAuthenticated={false}>
             <ForgotPassword />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: '/reset-password',
+        element: (
+          <PublicRoute>
+            <ResetPassword />
           </PublicRoute>
         ),
       },

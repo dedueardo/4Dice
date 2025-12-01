@@ -366,3 +366,26 @@ export interface CreateCharacterFormData {
   attributes: Attributes;
   avatar?: File;
 }
+
+// ==================== AUTH SERVICE TYPES ====================
+export interface LoginCredentials {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface RegisterData {
+  username: string;
+  email: string;
+  password: string;
+  avatar?: File;
+}
+
+export interface AuthResponse {
+  data: {
+    user: User;
+    accessToken: string;
+    refreshToken?: string;
+  };
+  success: boolean;
+}

@@ -33,7 +33,12 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config;
 
-    // Se o erro é 401 (não autorizado) e ainda não tentou fazer refresh
+    // CORREÇÃO: Se o erro 401 vier do Login, retorna o erro para o componente exibir o Toast
+    // em vez de tentar fazer refresh ou logout (que causa o reload)
+    if (originalRequest?.url?.includes('/login')) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && originalRequest && !(originalRequest as any)._retry) {
       (originalRequest as any)._retry = true;
 

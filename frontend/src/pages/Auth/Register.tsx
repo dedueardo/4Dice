@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Dices, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-import { useAuthStore } from '../../stores';
+import { authService } from '../../services';
 import { Button, Input } from '../../components/common';
 import { isStrongPassword } from '../../utils';
 
@@ -31,7 +31,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { register: registerUser, isLoading } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -68,19 +68,24 @@ export const Register: React.FC = () => {
   };
 
   const onSubmit = async (data: RegisterForm) => {
+    setIsLoading(true); // Inicia loading
     try {
-      await registerUser({
+      await authService.register({
         username: data.username,
         email: data.email,
         password: data.password,
-        confirmPassword: data.confirmPassword,
         avatar: avatarFile || undefined,
       });
 
       toast.success('Cadastro realizado com sucesso! Faça login para continuar.');
       navigate('/login');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao criar conta');
+      console.error('Erro no registro:', error);
+      toast.error(
+        error.response?.data?.message || 'Erro ao criar conta. Tente novamente.'
+      );
+    } finally {
+      setIsLoading(false); // Finaliza loading
     }
   };
 
@@ -199,17 +204,16 @@ export const Register: React.FC = () => {
                     {[1, 2, 3, 4].map((level) => (
                       <div
                         key={level}
-                        className={`h-1 flex-1 rounded-full transition-colors ${
-                          passwordStrength.errors.length >= 5 - level
-                            ? 'bg-gray-600'
-                            : passwordStrength.errors.length === 3
+                        className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength.errors.length >= 5 - level
+                          ? 'bg-gray-600'
+                          : passwordStrength.errors.length === 3
                             ? 'bg-red-500'
                             : passwordStrength.errors.length === 2
-                            ? 'bg-yellow-500'
-                            : passwordStrength.errors.length === 1
-                            ? 'bg-blue-500'
-                            : 'bg-green-500'
-                        }`}
+                              ? 'bg-yellow-500'
+                              : passwordStrength.errors.length === 1
+                                ? 'bg-blue-500'
+                                : 'bg-green-500'
+                          }`}
                       />
                     ))}
                   </div>
