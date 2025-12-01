@@ -1,18 +1,38 @@
 # 4Dice Backend (NestJS)
 
-API backend do projeto 4Dice, construído com NestJS, TypeORM e PostgreSQL. Este guia cobre configuração de ambiente, comandos para desenvolvimento, testes e build em Windows (PowerShell).
+API backend do projeto 4Dice, construído com **NestJS**, **TypeORM** e **PostgreSQL**.
+Este sistema gerencia autenticação, usuários, mesas de RPG e persistência de dados.
 
-## Requisitos
+## 🚀 Funcionalidades Implementadas
+
+- **Autenticação Completa:**
+  - Login (JWT Access Token).
+  - Registro de usuário com validação.
+  - Hash de senha seguro (Argon2/Bcrypt).
+- **Gerenciamento de Usuários:**
+  - Upload de Avatar (Armazenamento local em `/uploads`).
+  - Perfil de usuário.
+- **Sistema de E-mail:**
+  - Integração com Nodemailer.
+  - Suporte a Gmail (Produção) e Ethereal (Desenvolvimento).
+  - Envio de e-mail de boas-vindas.
+- **API Rest:**
+  - Prefixo global `/api`.
+  - Interceptores de resposta padrão (`{ data: ... }`).
+  - Tratamento de erros global.
+  - CORS habilitado para o Frontend (Vite).
+
+## 🛠️ Requisitos
+
 - Node.js 18+ e npm
-- PostgreSQL 13+
+- PostgreSQL 15+
 - Windows PowerShell 5.1 (padrão deste workspace)
 
-## Configuração do Ambiente
-1. Instale dependências:
+## ⚙️ Configuração do Ambiente
 
-```powershell
-cd "C:\Users\Daniel\Documents\GitHub\4dice\4Dice\backend"
-npm install
+1. Instale as dependências:
+
+```npm install
 ```
 
 2. Configure variáveis de ambiente em um arquivo `.env` na pasta `backend`:
@@ -40,6 +60,21 @@ psql -h localhost -U postgres -c "CREATE DATABASE \"4dice\";"
 
 Se não tiver `psql`, crie via ferramenta gráfica (pgAdmin) ou outro cliente.
 
+### 🐳 Opção: Banco de Dados via Docker
+
+Se preferir não instalar o PostgreSQL localmente, você pode rodar um container Docker:
+
+```powershell
+# Cria e inicia o container do PostgreSQL 15
+docker run --name postgres15 -e POSTGRES_PASSWORD=SUA_SENHA -p 5432:5432 -v dados-postgres:/var/lib/postgresql/data -d postgres
+```
+
+Depois de rodar o container, conecte-se a ele para criar o banco `4dice` (se o TypeORM não criar automaticamente):
+
+```powershell
+docker exec -it postgres15 psql -U postgres -c "CREATE DATABASE \"4dice\";"
+```
+
 ## Scripts Principais
 - `npm run start:dev`: inicia o servidor em modo desenvolvimento com watch.
 - `npm run start`: inicia sem watch.
@@ -51,20 +86,8 @@ Se não tiver `psql`, crie via ferramenta gráfica (pgAdmin) ou outro cliente.
 - `npm run lint`: lint com ESLint.
 - `npm run format`: formata com Prettier.
 
-## Executar em Desenvolvimento
-```powershell
-cd "C:\Users\Daniel\Documents\GitHub\4dice\4Dice\backend"
-npm run start:dev
-```
-
 O servidor inicia em `http://localhost:3000` (ou na porta definida em `PORT`).
 
-## Build e Produção
-```powershell
-cd "C:\Users\Daniel\Documents\GitHub\4dice\4Dice\backend"
-npm run build
-npm run start:prod
-```
 
 ## Testes
 ```powershell
@@ -85,7 +108,3 @@ Entidades são carregadas via glob `**/*.entity{.ts,.js}`. Com `synchronize: tru
 - Porta ocupada: altere `PORT` no `.env`.
 - Variáveis não carregadas: confirme que o arquivo `.env` está na pasta `backend` e sem espaços extras no nome.
 
-## Próximos Passos
-- Adicionar migrações do TypeORM para produção.
-- Configurar validação global usando `class-validator`/`class-transformer`.
-- Habilitar CORS conforme necessário para o frontend.

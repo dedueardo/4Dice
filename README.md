@@ -1,4 +1,3 @@
-
 # 🏗️ Fase 1: Estruturação Inicial e Arquitetura
 
 ## 1.1 Estrutura de Pastas FRONT-END
@@ -34,4 +33,57 @@ frontend/
 │   ├── routes/             # Configuração de rotas
 │   ├── assets/             # Imagens, ícones, etc
 │   └── styles/             # Estilos globais
+```
+
+## 1.2 Estrutura de Pastas BACK-END
+
+```
+backend/
+├── src/
+│   ├── auth/               # Módulo de Autenticação
+│   │   ├── dto/            # Data Transfer Objects (Login, Register)
+│   │   ├── guards/         # Guardiões de rotas (JWT Auth)
+│   │   ├── strategies/     # Estratégias de validação (Passport)
+│   │   ├── auth.controller.ts
+│   │   └── auth.service.ts
+│   ├── common/             # Recursos compartilhados
+│   │   └── interceptors/   # Interceptadores globais (Transform, Errors)
+│   ├── mail/               # Serviço de E-mail
+│   │   ├── mail.module.ts
+│   │   └── mail.service.ts # Integração Nodemailer (Gmail/Ethereal)
+│   ├── users/              # Módulo de Usuários
+│   │   ├── dto/            # DTOs de usuário
+│   │   ├── entities/       # Entidades TypeORM (Banco de Dados)
+│   │   ├── users.controller.ts
+│   │   └── users.service.ts
+│   ├── app.module.ts       # Módulo raiz da aplicação
+│   └── main.ts             # Ponto de entrada (Bootstrap)
+├── uploads/                # Armazenamento local de arquivos
+│   └── avatars/            # Imagens de perfil dos usuários
+├── test/                   # Testes automatizados (E2E)
+├── .env                    # Variáveis de ambiente
+└── package.json            backend/
+├── src/
+│   ├── auth/               # Módulo de Autenticação
+│   │   ├── dto/            # Data Transfer Objects (Login, Register)
+│   │   ├── guards/         # Guardiões de rotas (JWT Auth)
+│   │   ├── strategies/     # Estratégias de validação (Passport)
+│   │   ├── auth.controller.ts
+│   │   └── auth.service.ts
+│   ├── common/             # Recursos compartilhados
+│   │   └── interceptors/   # Interceptadores globais (Transform, Errors)
+│   ├── mail/               # Serviço de E-mail
+│   │   ├── mail.module.ts
+│   │   └── mail.service.ts # Integração Nodemailer (Gmail/Ethereal)
+│   ├── users/              # Módulo de Usuários
+│   │   ├── dto/            # DTOs de usuário
+│   │   ├── entities/       # Entidades TypeORM (Banco de Dados)
+│   │   ├── users.controller.ts
+│   │   └── users.service.ts
+│   ├── app.module.ts       # Módulo raiz da aplicação
+│   └── main.ts             # Ponto de entrada (Bootstrap)
+├── uploads/                # Armazenamento local de arquivos
+│   └── avatars/            # Imagens de perfil dos usuários
+├── .env                    # Variáveis de ambiente
+└── package.json
 ```
