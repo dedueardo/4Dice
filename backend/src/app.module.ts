@@ -4,7 +4,7 @@ import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module'; // <--- Importe aqui
+import { AuthModule } from './auth/auth.module'; 
 
 @Module({
   imports: [
@@ -27,10 +27,10 @@ import { AuthModule } from './auth/auth.module'; // <--- Importe aqui
 
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads', // Acessível via http://localhost:3000/uploads/avatars/nome-do-arquivo.jpg
+      serveRoot: '/uploads', 
     }),
     UsersModule,
-    AuthModule, // <--- Adicione aqui
+    AuthModule, 
   ],
 })
 export class AppModule {}

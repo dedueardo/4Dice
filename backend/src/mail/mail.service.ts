@@ -15,7 +15,7 @@ export class MailService {
         user: this.configService.get<string>('MAIL_USER'),
         pass: this.configService.get<string>('MAIL_PASS'),
       },
-      // ADICIONE ESTE BLOCO TLS
+
       tls: {
         rejectUnauthorized: false 
       }
@@ -43,7 +43,5 @@ export class MailService {
         </div>
       `,
     });
-    
-    console.log(`Email enviado para ${email} (Token: ${token})`);
   }
 }
